@@ -15,6 +15,9 @@ MYSQL_BACKUP_USER="${MYSQL_BACKUP_USER:-$USER}"         # Nome de usuário do My
 MYSQL_BACKUP_PASSWORD="${MYSQL_BACKUP_PASSWORD:-$PASSWORD}" # Senha do MySQL para backup
 MYSQL_BACKUP_DATABASE="${MYSQL_BACKUP_DATABASE:-$DBNAME}" # Nome do banco de dados para backup
 
+# Chave da API (obtida da variável de ambiente)
+API_KEY="${API_KEY:-}"
+
 # Nome do arquivo de backup
 BACKUP_FILE="${BACKUP_DIR}/backup_mysql_${MYSQL_BACKUP_DATABASE}_${DATA}.sql"
 
@@ -47,10 +50,16 @@ EOF
   # Envia a requisição para a API
   curl -X PUT \
     -H "Content-Type: application/json" \
-    -H "X-API-KEY: teste" \
+    -H "X-API-KEY: $API_KEY" \
     -d "$dados_json" \
     http://localhost:8000/api/super-admin/upsert-backup
 }
+
+# Verifica se a API Key foi definida
+if [ -z "$API_KEY" ]; then
+  echo "Erro: A variável de ambiente API_KEY não foi definida."
+  exit 1
+fi
 
 # Envia a requisição para a API com status "em_andamento"
 enviar_requisicao_api "em_andamento"
